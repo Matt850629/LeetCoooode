@@ -508,4 +508,363 @@ public class Leetcode {
 		while (i < j)
 			swap(nums, i++, j--);
 	}
+	
+	// 32.Longest Valid Parentheses
+	// see stack is empty or not, if current char is left bracket we add it,else we
+	// pop out.
+	public static int longestValidParentheses(String s) {
+		int length = 0;
+		if (s.length() == 0)
+			return 0;
+
+		Stack<Integer> st = new Stack<>();
+		st.push(-1);
+		for (int i = 0; i < s.length(); i++) {
+			int top = st.peek();
+			if (top != -1 && s.charAt(i) == ')' && s.charAt(top) == '(') {
+				st.pop();
+				length = Math.max(length, i - st.peek());
+			} else {
+				st.add(i);
+			}
+		}
+		return length;
+	}
+
+	// 33.Search in Rotated Sorted Array
+	// [4,5,6,7,0,1,2]
+	// [0,1,2,4,5,6,7]
+	public static int search(int[] nums, int target) {
+		int left = 0;
+		int right = nums.length - 1;
+		while (right >= left) {
+			int mid = left + (right - left) / 2;
+			if (nums[mid] == target)
+				return mid;
+			if (nums[mid] < nums[right]) {
+				if (target > nums[mid] && nums[right] >= target)
+					left = mid + 1;
+				else
+					right = mid - 1;
+
+			} else {
+				if (target < nums[mid] && nums[left] <= target)
+					right = mid - 1;
+				else
+					left = mid + 1;
+
+			}
+		}
+		return -1;
+	}
+
+	public static int gcd(int x, int y) {
+		int tmp;
+		while (x % y != 0) {
+			tmp = y;
+			y = x % y;
+			x = tmp;
+		}
+		return y;
+	}
+
+	// 34. Find First and Last Position of Element in Sorted Array
+	public static int[] searchRange(int[] nums, int target) {
+		var fIndex = findStartIndex(nums, target);
+		var lIdex = findLastIndex(nums, target);
+		int result[] = new int[2];
+		result[0] = fIndex;
+		result[1] = lIdex;
+		return result;
+	}
+
+	private static int findStartIndex(int nums[], int target) {
+		int left = 0;
+		int right = nums.length - 1;
+		int index = -1;
+		while (right >= left) {
+			int mid = left + right >> 1;
+			if (nums[mid] >= target)
+				right = mid - 1;
+			else if (nums[mid] <= target)
+				left = mid + 1;
+			if (nums[mid] == target)
+				index = mid;
+
+		}
+		return index;
+	}
+
+	private static int findLastIndex(int nums[], int target) {
+		int left = 0;
+		int right = nums.length - 1;
+		int index = -1;
+		while (left <= right) {
+			int mid = left + right >> 1;
+			if (nums[mid] <= target)
+				left = mid + 1;
+			else if (nums[mid] >= target)
+				right = mid - 1;
+			if (nums[mid] == target)
+				index = mid;
+
+		}
+		return index;
+	}
+
+	// 35.Search Insert Position
+	// Binary Search
+	public static int searchInsert(int[] nums, int target) {
+//		O(n)
+//		for (int i = 0; i < nums.length; ++i) {
+//            if (nums[i] >= target) return i;
+//        }
+//        return nums.length;
+//		O(logN)
+
+		int left = 0, right = nums.length - 1;
+		while (left + 1 < right) {
+			int mid = left + (right - left) / 2;
+			if (nums[mid] == target)
+				return mid;
+			else if (nums[mid] > target)
+				right = mid;
+			else
+				left = mid;
+
+		}
+		// 當target 比所有數字小的時候
+		if (nums[left] >= target && nums[right] >= target)
+			return left;
+		// target 沒出現在陣列但在其範圍內
+		else if (nums[left] <= target && nums[right] >= target)
+			return right;
+		// target 大於陣列中所有數字
+		else
+			return right + 1;
+
+	}
+
+	// 36.Valid Sudoku
+	// count 9 block, and 3 rows 3 columns in the every block
+	public static boolean isValidSudoku(char[][] board) {
+		var result = true;
+		for (int i = 0; i < 9; i++) {
+			result = checkRowValid(board, i);
+			if (!result)
+				return result;
+
+		}
+
+		for (int i = 0; i < 9; i++) {
+			result = checkColValid(board, i);
+			if (!result)
+				return result;
+
+		}
+
+		for (int i = 0; i < 9; i += 3) {
+			for (int j = 0; j < 9; j += 3) {
+				result = checkValidBlock(board, i, j);
+				if (!result)
+					return result;
+			}
+		}
+		return true;
+	}
+
+	private static boolean checkRowValid(char[][] board, int row) {
+		HashSet<Character> repeat = new HashSet<>();
+		for (int i = 0; i < 9; i++) {
+			if (board[row][i] != '.') {
+				if (repeat.contains(board[row][i]))
+					return false;
+
+				repeat.add(board[row][i]);
+			}
+		}
+		return true;
+	}
+
+	private static boolean checkColValid(char[][] board, int col) {
+		HashSet<Character> repeat = new HashSet<>();
+		for (int i = 0; i < 9; i++) {
+			if (board[i][col] != '.') {
+				if (repeat.contains(board[i][col]))
+					return false;
+
+				repeat.add(board[i][col]);
+			}
+		}
+		return true;
+	}
+
+	private static boolean checkValidBlock(char[][] board, int leftTopRow, int leftTopCol) {
+		HashSet<Character> repeat = new HashSet<>();
+		for (int i = leftTopRow; i < leftTopRow + 3; i++) {
+			for (int j = leftTopCol; j < leftTopCol + 3; j++) {
+				if (board[i][j] != '.')
+					if (repeat.contains(board[i][j]))
+						return false;
+				repeat.add(board[i][j]);
+
+			}
+		}
+		return true;
+
+	}
+
+	// 37.Sudoku Solver
+	// need isVaild() to judge is Validate Sudoku, use recursion to try all the
+	// result step by step.
+	public static void solveSudoku(char[][] board) {
+		traverse(board, 0, 0);
+	}
+
+	private static boolean traverse(char[][] board, int i, int j) {
+		// we traverse each cell from left to right, when the column is over 9,
+		// we move to next row, and when the row is 9 means it's in the end.
+		if (i == 9)
+			return true;
+		if (j >= 9)
+			return traverse(board, i + 1, 0);
+		if (board[i][j] != '.')
+			return traverse(board, i, j + 1);
+		// try numbers of 1-9
+		for (int c = '1'; c <= '9'; c++) {
+			if (!isValid(board, i, j, c))
+				continue;
+			board[i][j] = (char) c;
+			if (traverse(board, i, j + 1))
+				return true;
+			board[i][j] = '.';
+
+		}
+		return false;
+	}
+
+	// check if the board is valid with the constraint.
+	private static boolean isValid(char board[][], int i, int j, int c) {
+		for (int x = 0; x < 9; x++) {
+			if (board[x][j] == c)
+				return false;
+		}
+
+		for (int y = 0; y < 9; y++) {
+			if (board[i][y] == c) {
+				return false;
+			}
+		}
+		// block index
+		int row = i - i % 3;
+		int col = j - j % 3;
+		for (int x = 0; x < 3; x++) {
+			for (int y = 0; y < 3; y++) {
+				if (board[row + x][col + y] == c)
+					return false;
+			}
+		}
+		return true;
+	}
+
+	// 38.Count and Say
+	public static String countAndSay(int n) {
+		int i = 1;
+		String result = "1";
+		if (n == 1)
+			return result;
+
+		while (n > i) {
+			int count = 1;
+			StringBuilder sb = new StringBuilder();
+			for (int j = 1; j < result.length(); j++) {
+				if (result.charAt(j) == result.charAt(j - 1)) {
+					count++;
+				} else {
+					sb.append(count).append(result.charAt(j - 1));
+					count = 1;
+				}
+			}
+			sb.append(count).append(result.charAt(result.length() - 1));
+			result = sb.toString();
+			i++;
+		}
+		return result;
+	}
+
+	// 39. Combination Sum
+	// DFS concept
+	public static List<List<Integer>> combinationSum(int[] candidates, int target) {
+		List<List<Integer>> res = new ArrayList<>();
+		dfs(0, target, new ArrayList<Integer>(), candidates, res);
+		return res;
+
+	}
+
+	private static void dfs(int start, int target, ArrayList<Integer> list, int[] candidates, List<List<Integer>> res) {
+		if (target == 0) {
+			res.add(new ArrayList<>(list));
+			return;
+		}
+
+		if (target < 0)
+			return;
+
+		for (int i = start; i < candidates.length; i++) {
+			list.add(candidates[i]);
+			dfs(i, target - candidates[i], list, candidates, res);
+			list.remove(list.size() - 1);
+		}
+
+	}
+
+	// 40.CombinationSum2
+	// dps concept ,but we need to sort and avoid using same element.
+	public static List<List<Integer>> combinationSum2(int[] candidates, int target) {
+		List<List<Integer>> res = new ArrayList<>();
+		Arrays.sort(candidates);
+		helper(0, target, res, new ArrayList<Integer>(), candidates);
+		return res;
+	}
+
+	private static void helper(int start, int target, List<List<Integer>> res, ArrayList<Integer> list,
+			int[] candidates) {
+		if (target == 0) {
+			res.add(new ArrayList<>(list));
+			return;
+		}
+		if (target < 0)
+			return;
+
+		for (int i = start; i < candidates.length; i++) {
+			if (start < i && candidates[i] == candidates[i - 1])
+				continue;
+			list.add(candidates[i]);
+			helper(i + 1, target - candidates[i], res, list, candidates);
+			list.remove(list.size() - 1);
+		}
+	}
+
+	// 268.missingNumbers
+//	public static int missingNumber(int[] nums) {
+//		int sum = 0;
+//		for (int i = 0; i < nums.length; i++) {
+//			sum += nums[i];
+//		}
+//		return (nums.length) * (nums.length + 1) / 2 - sum;
+//	}
+
+	public static int missingNumber(int[] nums) {
+		Set<Integer> numSet = new HashSet<Integer>();
+		for (int num : nums)
+			numSet.add(num);
+
+		int expectedNumCount = nums.length + 1;
+		for (int number = 0; number < expectedNumCount; number++) {
+			if (!numSet.contains(number)) {
+				return number;
+			}
+		}
+		return -1;
+	}
 }
