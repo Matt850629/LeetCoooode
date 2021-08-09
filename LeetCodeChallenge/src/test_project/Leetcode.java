@@ -867,4 +867,62 @@ public class Leetcode {
 		}
 		return -1;
 	}
+	
+	// 41.First missing positive
+	// use indexing sort
+	public static int firstMissingPositive(int[] nums) {
+		if (nums.length == 0 || nums == null)
+			return 1;
+
+		for (int i = 0; i < nums.length; i++) {
+			// 需是正數且小於自身長度，及避免相鄰兩數相同造成死循環
+			if (nums[i] <= nums.length && nums[i] > 0 && nums[nums[i] - 1] != nums[i]) {
+				int temp = nums[nums[i] - 1];
+				nums[nums[i] - 1] = nums[i];
+				nums[i] = temp;
+				// 始終在第一個數的地方交換
+				i--;
+			}
+		}
+
+		for (int i = 0; i < nums.length; i++)
+			if (nums[i] != i + 1)
+				return i + 1;
+
+		return nums.length + 1;
+	}
+
+	// 43.Multiply Strings
+	public static String multiply(String num1, String num2) {
+		String n1 = new StringBuilder(num1).reverse().toString();
+		String n2 = new StringBuilder(num2).reverse().toString();
+
+		int[] d = new int[num1.length() + num2.length()];
+
+		// multiply each digit and sum at the corresponding positions
+		for (int i = 0; i < n1.length(); i++) {
+			for (int j = 0; j < n2.length(); j++) {
+				d[i + j] += (n1.charAt(i) - '0') * (n2.charAt(j) - '0');
+
+			}
+		}
+		StringBuilder sb = new StringBuilder();
+
+		// calculate each digit
+		for (int i = 0; i < d.length; i++) {
+			int mod = d[i] % 10;
+			int carry = d[i] / 10;
+			if (i + 1 < d.length)
+				d[i + 1] += carry;
+
+			sb.insert(0, mod);
+		}
+
+		// remove the number of 0 in index[0]
+		while (sb.charAt(0) == '0' && sb.length() > 1)
+			sb.deleteCharAt(0);
+
+		return sb.toString();
+
+	}
 }
